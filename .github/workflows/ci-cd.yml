@@ -28,13 +28,14 @@ jobs:
         run: ls -R
 
       # ----------------------
-      # 3. Setup Java for Backend
+      # 3. Setup Java and Maven for Backend
       # ----------------------
-      - name: Set up JDK 17
+      - name: Set up JDK 17 and Maven
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+          maven-version: '3.9.11'
           cache: 'maven'
 
       # ----------------------
@@ -49,17 +50,11 @@ jobs:
             ${{ runner.os }}-maven-
 
       # ----------------------
-      # 4. Make mvnw executable (Backend)
-      # ----------------------
-      - name: Make mvnw executable
-        run: chmod +x ./Weatherly/mvnw
-
-      # ----------------------
       # 5. Build Backend (Maven)
       # ----------------------
       - name: Build Backend (Maven)
         working-directory: Weatherly
-        run: ./mvnw clean package -DskipTests
+        run: mvn clean package -DskipTests
 
       # ----------------------
       # 6. Build Backend Docker Image
