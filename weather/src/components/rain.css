@@ -1,0 +1,34 @@
+.rain {
+  pointer-events: none;
+}
+
+.drop {
+  width: 2px;
+  height: 8px;
+  background: rgba(18, 176, 238, 0.7);
+  margin: 0 2px;
+  border-radius: 1px;
+  animation: fall 1s infinite linear;
+}
+
+.drop.delay-1 {
+  animation-delay: 0.2s;
+}
+
+.drop.delay-2 {
+  animation-delay: 0.4s;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-5px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
