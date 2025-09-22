@@ -70,46 +70,36 @@ jobs:
       # ----------------------
       # 7. Setup Node.js for Frontend
       # ----------------------
+      - name: List frontend app directory
+        run: ls -la weather/myapp
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: weather/myapp/package-lock.json
 
       # ----------------------
-      # 8. Cache and Install Frontend Dependencies
+      # 8. Install and Build Frontend
       # ----------------------
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: cache-npm
-        with:
-          path: weather/myapp/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('weather/myapp/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install Frontend Dependencies
-        if: steps.cache-npm.outputs.cache-hit != 'true'
+      - name: Install and Build Frontend
         working-directory: weather/myapp
-        run: npm ci
-
-      # ----------------------
-      # 9. Build Frontend
-      # ----------------------
-      - name: Build Frontend
-        working-directory: weather/myapp
-        run: npm run build
+        run: |
+          npm ci
+          npm run build
 
       # ----------------------
       # 10. Build Frontend Docker Image
       # ----------------------
       - name: Build Frontend Docker Image
-        run: docker build -t 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-frontend:latest weather/myapp
+        run: docker build -f weather/myapp/Dockerfile -t 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-frontend:latest weather/myapp
 
       # ----------------------
       # 11. Push Images to ECR (Optional - only if you deploy via AWS)
       # ----------------------
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
