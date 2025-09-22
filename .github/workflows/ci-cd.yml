@@ -81,7 +81,7 @@ jobs:
       - name: Install and Build Frontend
         working-directory: weather/myapp
         run: |
-          npm ci
+          npm install
           npm run build
 
       # ----------------------
