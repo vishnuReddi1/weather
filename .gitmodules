@@ -1,4 +1,4 @@
 [submodule "weather/myapp"]
 	path = weather/myapp
-	url = https://github.com/vishnuReddi1/cicd_project.git
+	url = https://github.com/vishnuReddi1/<correct_frontend_repo_name>.git
 	branch = master

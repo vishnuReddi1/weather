@@ -21,19 +21,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
-          submodules: true
           fetch-depth: 0
 
       - name: List directory after checkout for debugging
         run: ls -R
-
-      # ----------------------
-      # 2. Initialize and Update Submodules
-      # ----------------------
-      - name: Initialize and Update Submodules
-        run: |
-          git submodule init
-          git submodule update --recursive
 
       # ----------------------
       # 3. Setup Java for Backend
@@ -121,4 +112,4 @@ jobs:
             cd /home/ubuntu/cicd_project
             git pull origin main
             docker compose pull
-            docker compose up -d --build
+            docker compose up -d
