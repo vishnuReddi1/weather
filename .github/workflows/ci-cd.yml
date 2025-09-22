@@ -21,8 +21,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
-          # Explicitly disable submodule checkout to fix the error.
-          submodules: false
+          submodules: false # This should be false to prevent the error
           fetch-depth: 0
 
       - name: List directory after checkout for debugging
@@ -36,6 +35,18 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'maven'
+
+      # ----------------------
+      # 4. Cache Maven dependencies
+      # ----------------------
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
       # ----------------------
       # 4. Make mvnw executable (Backend)
@@ -62,7 +73,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'
+          cache: 'npm'
 
       # ----------------------
       # 8. Build Frontend

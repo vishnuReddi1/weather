@@ -6,6 +6,7 @@
 
 # Build output
 /weather/myapp/build
+/weather/myapp/.cache
 /Weatherly/target
 
 # IDE files
