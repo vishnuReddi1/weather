@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  backend:
+    image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-backend:${TAG:-latest}
+    restart: unless-stopped
+    environment:
+      # H2 database configuration for Docker
+      SPRING_DATASOURCE_URL: jdbc:h2:mem:weatherly_db
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: ""
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.h2.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+      SPRING_JPA_SHOW_SQL: true
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.H2Dialect
+      SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION: true
+      SPRING_H2_CONSOLE_ENABLED: true
+      SPRING_H2_CONSOLE_PATH: /h2-console
+    ports:
+      - "8080:8018"
+    networks:
+      - appnet
+
+  frontend:
+    image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-frontend:${TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    driver: bridge

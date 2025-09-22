@@ -1,0 +1,124 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ----------------------
+      # 1. Checkout repository
+      # ----------------------
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: List directory after checkout for debugging
+        run: ls -R
+
+      # ----------------------
+      # 2. Initialize and Update Submodules
+      # ----------------------
+      - name: Initialize and Update Submodules
+        run: |
+          git submodule init
+          git submodule update --recursive
+
+      # ----------------------
+      # 3. Setup Java for Backend
+      # ----------------------
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # ----------------------
+      # 4. Make mvnw executable (Backend)
+      # ----------------------
+      - name: Make mvnw executable
+        run: chmod +x ./Weatherly/mvnw
+
+      # ----------------------
+      # 5. Build Backend (Maven)
+      # ----------------------
+      - name: Build Backend (Maven)
+        working-directory: Weatherly
+        run: ./mvnw clean package -DskipTests
+
+      # ----------------------
+      # 6. Build Backend Docker Image
+      # ----------------------
+      - name: Build Backend Docker Image
+        run: docker build -t 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-backend:latest ./Weatherly
+
+      # ----------------------
+      # 7. Setup Node.js for Frontend
+      # ----------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # ----------------------
+      # 8. Build Frontend
+      # ----------------------
+      - name: Install & Build Frontend
+        working-directory: weather/myapp
+        run: |
+          npm install
+          npm run build
+
+      # ----------------------
+      # 9. Build Frontend Docker Image
+      # ----------------------
+      - name: Build Frontend Docker Image
+        run: docker build -t 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-frontend:latest weather/myapp
+
+      # ----------------------
+      # 10. Push Images to ECR (Optional - only if you deploy via AWS)
+      # ----------------------
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Push Backend Image
+        run: |
+          docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-backend:latest
+
+      - name: Push Frontend Image
+        run: |
+          docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-frontend:latest
+
+      # ----------------------
+      # 11. Deploy to EC2 (via SSH)
+      # ----------------------
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/cicd_project
+            git pull origin main
+            docker compose pull
+            docker compose up -d --build
