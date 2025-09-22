@@ -19,7 +19,7 @@ jobs:
       # 1. Checkout repository
       # ----------------------
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: false # This should be false to prevent the error
           fetch-depth: 0
@@ -71,10 +71,11 @@ jobs:
       # 7. Setup Node.js for Frontend
       # ----------------------
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: weather/myapp/package-lock.json
 
       # ----------------------
       # 8. Build Frontend
