@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weatherly-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weatherly-backend
+  template:
+    metadata:
+      labels:
+        app: weatherly-backend
+    spec:
+      containers:
+      - name: backend
+        image: weatherly-backend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8018
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:h2:mem:weatherly_db"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "sa"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: ""
+        - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+          value: "org.h2.Driver"
+        - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+          value: "create-drop"
+        - name: SPRING_JPA_SHOW_SQL
+          value: "true"
+        - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+          value: "org.hibernate.dialect.H2Dialect"
+        - name: SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION
+          value: "true"
+        - name: SPRING_H2_CONSOLE_ENABLED
+          value: "true"
+        - name: SPRING_H2_CONSOLE_PATH
+          value: "/h2-console"

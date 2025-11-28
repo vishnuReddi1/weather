@@ -16,7 +16,7 @@ function AppRouter() {
       {!user && (
         <>
           <video
-            className="absolute top-0 left-0 w-full h-full object-cover brightness-110 contrast-125 saturate-125"
+            className="absolute top-0 left-0 w-full h-full object-cover"
             src={signupVideo}
             autoPlay
             loop

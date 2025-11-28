@@ -1,0 +1,27 @@
+---
+- name: Deploy Weatherly to Kubernetes
+  hosts: local
+  gather_facts: no
+  tasks:
+    - name: Apply ConfigMap
+      command: kubectl apply -f ../k8s/configmap-frontend.yaml
+
+    - name: Apply Backend Deployment
+      command: kubectl apply -f ../k8s/deployment-backend.yaml
+
+    - name: Apply Backend Service
+      command: kubectl apply -f ../k8s/service-backend.yaml
+
+    - name: Apply Frontend Deployment
+      command: kubectl apply -f ../k8s/deployment-frontend.yaml
+
+    - name: Apply Frontend Service
+      command: kubectl apply -f ../k8s/service-frontend.yaml
+
+    - name: Verify Pods
+      command: kubectl get pods
+      register: pod_status
+
+    - name: Show Pod Status
+      debug:
+        var: pod_status.stdout_lines

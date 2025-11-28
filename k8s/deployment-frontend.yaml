@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weatherly-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weatherly-frontend
+  template:
+    metadata:
+      labels:
+        app: weatherly-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: weatherly-frontend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-config-volume
+          mountPath: /etc/nginx/conf.d/
+      volumes:
+      - name: nginx-config-volume
+        configMap:
+          name: nginx-config

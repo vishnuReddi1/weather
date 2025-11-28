@@ -1,0 +1,20 @@
+---
+- name: Check Weatherly Status
+  hosts: local
+  gather_facts: no
+  tasks:
+    - name: Get Pods
+      command: kubectl get pods
+      register: pods_output
+
+    - name: Get Services
+      command: kubectl get svc
+      register: svc_output
+
+    - name: Display Pods
+      debug:
+        var: pods_output.stdout_lines
+
+    - name: Display Services
+      debug:
+        var: svc_output.stdout_lines
